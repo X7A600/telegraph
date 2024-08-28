@@ -34,9 +34,10 @@ async function handleRequest(request) {
 // 处理根请求，返回首页 HTML
 function handleRootRequest() {
   return new Response(`
-  <!DOCTYPE html>
-  <html lang="zh">
-  <head>
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Telegraph图床-基于Workers的图床服务">
@@ -47,77 +48,110 @@ function handleRootRequest() {
     <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-fileinput/5.2.7/css/fileinput.min.css" rel="stylesheet" />
     <link href="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/toastr.js/2.1.4/toastr.min.css" rel="stylesheet" />
     <style>
-      body {
-        margin: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-      }
-      .background {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        z-index: -1;
-        transition: opacity 1s ease-in-out;
-        opacity: 1;
-      }
-      .background.next {
-        opacity: 0;
-      }
-      .card {
-        background-color: rgba(255, 255, 255, 0.8);
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        padding: 20px;
-        width: 90%;
-        max-width: 400px;
-        text-align: center;
-        margin: 0 auto;
-      }
-      @media (max-width: 576px) {
-        .card {
-          margin: 20px;
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #333;
         }
-      }
-      .uniform-height {
-        margin-top: 20px;
-      }
+
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            z-index: -1;
+            transition: opacity 1s ease-in-out;
+            opacity: 1;
+        }
+
+        .background.next {
+            opacity: 0;
+        }
+
+        .card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 20px;
+        }
+
+        .file-input-container {
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            border-radius: 5px;
+        }
+
+        .uniform-height {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        textarea {
+            resize: none;
+            overflow: hidden;
+        }
+
+        @media (max-width: 576px) {
+            .card {
+                padding: 20px;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="background" id="background"></div>
     <div class="card">
-      <div class="title">Telegraph图床</div>
-      <div class="card-body">
-        <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
-          <div class="file-input-container">
-            <input id="fileInput" name="file" type="file" class="form-control-file" data-browse-on-zone-click="true">
-          </div>
-          <div class="form-group mb-3 uniform-height" style="display: none;">
-            <button type="button" class="btn btn-light mr-2" id="urlBtn">URL</button>
-            <button type="button" class="btn btn-light mr-2" id="bbcodeBtn">BBCode</button>
-            <button type="button" class="btn btn-light" id="markdownBtn">Markdown</button>
-          </div>
-          <div class="form-group mb-3 uniform-height" style="display: none;">
-            <textarea class="form-control" id="fileLink" readonly></textarea>
-          </div>
-          <div id="uploadingText" class="uniform-height" style="display: none; text-align: center;">文件上传中...</div>
-          <div id="compressingText" class="uniform-height" style="display: none; text-align: center;">图片压缩中...</div>
-        </form>
-      </div>
-      <p style="font-size: 14px; text-align: center;">
-        
-      </p>
-      <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/3.6.0/jquery.min.js" type="application/javascript"></script>
-      <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-fileinput/5.2.7/js/fileinput.min.js" type="application/javascript"></script>
-      <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-fileinput/5.2.7/js/locales/zh.min.js" type="application/javascript"></script>
-      <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/toastr.js/2.1.4/toastr.min.js" type="application/javascript"></script>
-      <script>
+        <div class="title">Telegraph图床</div>
+        <div class="card-body">
+            <form id="uploadForm" action="/upload" method="post" enctype="multipart/form-data">
+                <div class="file-input-container">
+                    <input id="fileInput" name="file" type="file" class="form-control-file" data-browse-on-zone-click="true">
+                </div>
+                <div class="form-group mb-3 uniform-height" style="display: none;">
+                    <button type="button" class="btn btn-light mr-2" id="urlBtn">URL</button>
+                    <button type="button" class="btn btn-light mr-2" id="bbcodeBtn">BBCode</button>
+                    <button type="button" class="btn btn-light" id="markdownBtn">Markdown</button>
+                </div>
+                <div class="form-group mb-3 uniform-height" style="display: none;">
+                    <textarea class="form-control" id="fileLink" readonly></textarea>
+                </div>
+                <div id="uploadingText" class="uniform-height" style="display: none; text-align: center;">文件上传中...</div>
+                <div id="compressingText" class="uniform-height" style="display: none; text-align: center;">图片压缩中...</div>
+            </form>
+        </div>
+        <p style="font-size: 14px; text-align: center;">
+        </p>
+    </div>
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/jquery/3.6.0/jquery.min.js" type="application/javascript"></script>
+    <script src="https://lf26-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-fileinput/5.2.7/js/fileinput.min.js" type="application/javascript"></script>
+    <script src="https://lf3-cdn-tos.bytecdntp.com/cdn/expire-1-M/bootstrap-fileinput/5.2.7/js/locales/zh.min.js" type="application/javascript"></script>
+    <script src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/toastr.js/2.1.4/toastr.min.js" type="application/javascript"></script>
+    <script>
         async function fetchBingImages() {
           const response = await fetch('/bing-images');
           const data = await response.json();
